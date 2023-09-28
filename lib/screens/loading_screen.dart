@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:tempo_template/services/location.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -15,15 +16,29 @@ class _LoadingScreenState extends State<LoadingScreen> {
     var location = Location();
     await location.getCurrentLocation();
 
-    log(
+    print(
       'Latitude: ${location.latitude}, Longitude: ${location.longitude}',
     );
+  }
+
+  Future<void> getData() async {
+    var url = Uri.parse(
+        'https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b6907d289e10d714a6e88b30761fae22');
+    http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      // se a requisição foi feita com sucesso
+      var data = response.body;
+      print(data); // imprima o resultado
+    } else {
+      print(response.statusCode.toString()); // senão, imprima o código de erro
+    }
   }
 
   @override
   void initState() {
     super.initState();
     getLocation();
+    getData();
   }
 
   @override
