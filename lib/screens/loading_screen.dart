@@ -2,7 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:tempo_template/services/location.dart';
+import 'package:tempo_template/models/location.dart';
+import 'package:tempo_template/services/location_service.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -12,32 +13,32 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  Future<void> getLocation() async {
-    var location = Location();
-    await location.getCurrentLocation();
+  Future<Location> getLocation() async {
+    LocationService locationService = LocationService();
+    var location = await locationService.getCurrentLocation();
 
-    print(
-      'Latitude: ${location.latitude}, Longitude: ${location.longitude}',
-    );
+    return location;
   }
 
   Future<void> getData() async {
+    var location = await getLocation();
+
+    var apiKey = '220ba8ca770b4c863e46eb9925da78a6';
     var url = Uri.parse(
-        'https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b6907d289e10d714a6e88b30761fae22');
+        'https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&units=metric&appid=$apiKey');
     http.Response response = await http.get(url);
     if (response.statusCode == 200) {
       // se a requisição foi feita com sucesso
       var data = response.body;
-      print(data); // imprima o resultado
+      log(data); // imprima o resultado
     } else {
-      print(response.statusCode.toString()); // senão, imprima o código de erro
+      log(response.statusCode.toString()); // senão, imprima o código de erro
     }
   }
 
   @override
   void initState() {
     super.initState();
-    getLocation();
     getData();
   }
 
