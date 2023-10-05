@@ -1,7 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:tempo_template/models/location.dart';
+import 'package:tempo_template/models/weather_data.dart';
+import 'package:tempo_template/screens/location_screen.dart';
 import 'package:tempo_template/services/location_service.dart';
 
 import '../services/networking.dart';
@@ -31,11 +32,16 @@ class _LoadingScreenState extends State<LoadingScreen> {
     var networkHelper = NetworkHelper(url);
     var networkData = await networkHelper.getData();
 
-    var cityName = networkData["name"];
-    var temperature = networkData["main"]["temp"];
-    var condition = networkData["weather"][0]["id"];
+    pushToLocationScreen(WeatherData.fromJson(networkData));
+  }
 
-    log('cityName: $cityName, temperature: $temperature, condition: $condition');
+  void pushToLocationScreen(WeatherData weatherData) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => LocationScreen(
+                  weatherData: weatherData,
+                )));
   }
 
   @override
@@ -46,16 +52,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // obtém a localização atual
-            getLocation();
-          },
-          child: const Text('Obter Localização'),
-        ),
-      ),
+          child: SpinKitDoubleBounce(
+        color: Colors.white,
+        size: 100.0,
+      )),
     );
   }
 }

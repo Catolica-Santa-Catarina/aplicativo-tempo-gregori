@@ -1,14 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:tempo_template/models/weather_data.dart';
 import 'package:tempo_template/utilities/constants.dart';
 
 class LocationScreen extends StatefulWidget {
-  const LocationScreen({Key? key}) : super(key: key);
+  const LocationScreen({required this.weatherData, Key? key}) : super(key: key);
+
+  final WeatherData weatherData;
 
   @override
   State<LocationScreen> createState() => _LocationScreenState();
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  late WeatherData weatherData;
+  late String message;
+  late String weatherIcon;
+
+  void updateUI() {
+    setState(() {
+      weatherData = widget.weatherData;
+      message = weatherData.getMessage();
+      weatherIcon = weatherData.getWeatherIcon();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updateUI();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,22 +70,22 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 15.0),
                 child: Row(
-                  children: const [
+                  children: [
                     Text(
-                      '32°',
+                      '${weatherData.temp}°',
                       style: kTempTextStyle,
                     ),
                     Text(
-                      '☀️',
+                      weatherIcon,
                       style: kConditionTextStyle,
                     )
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(right: 15.0),
+              Padding(
+                padding: const EdgeInsets.only(right: 15.0),
                 child: Text(
-                  'É tempo de 🍦 em Joinville!',
+                  '$message em ${weatherData.cityName}',
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),
