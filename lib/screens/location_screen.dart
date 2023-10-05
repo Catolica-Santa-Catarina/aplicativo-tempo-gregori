@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tempo_template/models/weather_data.dart';
+import 'package:tempo_template/screens/city_screen.dart';
+import 'package:tempo_template/services/weather.dart';
 import 'package:tempo_template/utilities/constants.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -16,9 +18,9 @@ class _LocationScreenState extends State<LocationScreen> {
   late String message;
   late String weatherIcon;
 
-  void updateUI() {
+  void updateUI(WeatherData weatherData) {
     setState(() {
-      weatherData = widget.weatherData;
+      this.weatherData = weatherData;
       message = weatherData.getMessage();
       weatherIcon = weatherData.getWeatherIcon();
     });
@@ -27,7 +29,7 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   void initState() {
     super.initState();
-    updateUI();
+    updateUI(widget.weatherData);
   }
 
   @override
@@ -52,14 +54,26 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      weatherData = await WeatherService().getLocationWeather();
+                      updateUI(weatherData);
+                    },
                     child: const Icon(
                       Icons.near_me,
                       size: 50.0,
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var cityName = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CityScreen()));
+
+                      var weatherData = await WeatherService()
+                          .getCityWeather(cityName.toString());
+                      updateUI(weatherData);
+                    },
                     child: const Icon(
                       Icons.location_city,
                       size: 50.0,
